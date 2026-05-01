@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0-alpine
+    container_name: timesheet-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: timesheet
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    restart: unless-stopped
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - timesheet-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: timesheet-backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: mongodb+srv://admin:password@mongodb:27017/timesheet?authSource=admin
+      DEBUG: "false"
+      CORS_ORIGINS: "http://localhost:3000,http://localhost:5173"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    volumes:
+      - ./app:/app/app
+    restart: unless-stopped
+    networks:
+      - timesheet-network
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  mongodb_data:
+  mongodb_config:
+
+networks:
+  timesheet-network:
+    driver: bridge
+
