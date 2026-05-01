@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
 
     DATABASE_URL: str = "mongodb://localhost:27017"
+    SERVER_PORT: int = 9079
     
     FIRST_SUPERUSER: str = "superadmin@example.com"
     FIRST_SUPERUSER_PASSWORD: str = "superadminpassword"
