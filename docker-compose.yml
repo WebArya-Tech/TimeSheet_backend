@@ -28,11 +28,11 @@ services:
       dockerfile: Dockerfile
     container_name: timesheet-backend
     ports:
-      - "8000:8000"
+      - "9079:9079"
     environment:
       DATABASE_URL: mongodb+srv://admin:password@mongodb:27017/timesheet?authSource=admin
       DEBUG: "false"
-      CORS_ORIGINS: "http://localhost:3000,http://localhost:5173"
+      CORS_ORIGINS: "http://localhost:9078,http://localhost:5173"
     depends_on:
       mongodb:
         condition: service_healthy
@@ -41,7 +41,7 @@ services:
     restart: unless-stopped
     networks:
       - timesheet-network
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn app.main:app --host 0.0.0.0 --port 9079 --reload
 
 volumes:
   mongodb_data:
